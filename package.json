@@ -1,0 +1,20 @@
+{
+  "name": "shit-head-server",
+  "version": "1.0.0",
+  "description": "ShitHead Server",
+  "main": "server.js",
+  "scripts": {
+    "prod": "node server",
+    "start": "nodemon server"
+  },
+  "author": "Neil Barry",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "socket.io": "^4.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
