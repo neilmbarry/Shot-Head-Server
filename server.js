@@ -8,6 +8,10 @@ const io = require("socket.io")(server, {
   },
 });
 
+app.get("/", function (req, res) {
+  res.send("<h1>Shit Head is Ready!</h1>");
+});
+
 io.on("connection", (socket) => {
   console.log("New User connected");
 
@@ -92,6 +96,6 @@ io.on("connection", (socket) => {
 //   console.log(message);
 // });
 
-server.listen(4000, function () {
+server.listen(process.env.PORT || 4000, function () {
   console.log("listening on port 4000");
 });
