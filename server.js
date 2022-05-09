@@ -1,9 +1,17 @@
 const app = require("express")();
 
 const server = require("http").createServer(app);
+
+let origin;
+
+if (process.env.NODE_ENV === "development") {
+  origin = "http://localhost:3000";
+} else {
+  origin = "https://shot-head-react.vercel.app";
+}
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://shot-head-react.vercel.app",
+    origin,
     methods: ["GET", "POST"],
   },
 });

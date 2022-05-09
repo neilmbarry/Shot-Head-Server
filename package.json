@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "prod": "node server",
-    "start": "nodemon server"
+    "start": "nodemon server",
+    "dev": "NODE_ENV=development nodemon server"
   },
   "author": "Neil Barry",
   "license": "ISC",
