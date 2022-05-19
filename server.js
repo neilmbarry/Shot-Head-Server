@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "development") {
 }
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://shot-head-react.vercel.app",
+    origin,
     methods: ["GET", "POST"],
   },
 });
@@ -29,13 +29,14 @@ io.on("connection", (socket) => {
   socket.emit("message", socket.handshake.query.t);
 
   // To everyone but 1 user
-  console.log("[SERVER] A user has joined");
+
   socket.broadcast.emit(
     "message",
     `[SERVER] A user NEW has joined: ${socket.handshake.query.t}`
   );
 
   socket.on("disconnect", () => {
+    console.log("A User disconnected");
     // To everyone
     io.emit("message", "[SERVER] A user has left the chat");
   });
@@ -50,9 +51,34 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("groupChat", message);
   });
 
-  socket.on("addPlayer", (player) => {
-    console.log("adding player");
-    io.emit("addPlayer", player);
+  socket.on("joinRoom", (room) => {
+    console.log("Someone has joined room: ", room);
+    socket.join(room);
+  });
+
+  socket.on("leaveRoom", (room) => {
+    console.log("Someone has left room: ", room);
+    socket.leave(room);
+  });
+
+  socket.on("addPlayer", (data) => {
+    console.log(`Adding player '${data.name}' to room: '${data.room}'`);
+    io.in(data.room).emit("addPlayer", data.name);
+  });
+  socket.on("getGameState", (data) => {
+    console.log(`'${data.newPlayer}' is requesting state data`);
+    io.in(data.room).emit("shareGameState", data.newPlayer);
+    // socket.to(data.room).emit("shareGameState", data.newPlayer);
+  });
+  socket.on("setGameState", (data) => {
+    console.log(`Sending state to all users`);
+    io.in(data.state.room).emit("setGameState", data.state);
+    console.log(
+      `Adding player $'{data.newPlayer}' to room: '${data.state.room}'`
+    );
+    io.in(data.state.room).emit("addPlayer", data.newPlayer);
+
+    // io.emit("setGameState", state);
   });
 
   socket.on("readyPlayer", (player) => {
@@ -90,13 +116,6 @@ io.on("connection", (socket) => {
   });
   socket.on("newGame", () => {
     io.emit("newGame");
-  });
-  socket.on("getGameState", () => {
-    socket.broadcast.emit("shareGameState");
-  });
-  socket.on("setGameState", (state) => {
-    socket.broadcast.emit("setGameState", state);
-    // io.emit("setGameState", state);
   });
 });
 
