@@ -69,6 +69,11 @@ io.on("connection", (socket) => {
     io.in(data.room).emit("addPlayer", data.name);
   });
   socket.on("getGameState", (data) => {
+    const clients = io.sockets.adapter.rooms.get(data.room);
+    const numClients = clients ? clients.size : 0;
+    if (numClients === 0) {
+      return io.in(data.room).emit("addPlayer", data.newPlayer);
+    }
     console.log(`'${data.newPlayer}' is requesting state data`);
     io.in(data.room).emit("shareGameState", data.newPlayer);
     // socket.to(data.room).emit("shareGameState", data.newPlayer);
@@ -84,8 +89,8 @@ io.on("connection", (socket) => {
     // io.emit("setGameState", state);
   });
 
-  socket.on("readyPlayer", (player) => {
-    io.emit("readyPlayer", player);
+  socket.on("readyPlayer", (info) => {
+    io.in(info.room).emit("readyPlayer", info.playerNumber);
   });
 
   socket.on("title", (message) => {
@@ -93,26 +98,26 @@ io.on("connection", (socket) => {
     io.emit("title", message);
   });
 
-  socket.on("dealCards", (deck) => {
-    io.emit("dealCards", deck);
+  socket.on("dealCards", (info) => {
+    io.in(info.room).emit("dealCards", info.deck);
   });
 
-  socket.on("setFaceUpCards", ({ cards, player }) => {
-    io.emit("setFaceUpCards", { cards, player });
+  socket.on("setFaceUpCards", ({ cards, player, room }) => {
+    io.in(room).emit("setFaceUpCards", { cards, player });
   });
 
-  socket.on("pickUpStack", (player) => {
-    io.emit("pickUpStack", player);
+  socket.on("pickUpStack", (info) => {
+    io.in(info.room).emit("pickUpStack", info.playerNumber);
   });
 
   socket.on("playCards", (data) => {
-    io.emit("playCards", data);
+    io.in(data.room).emit("playCards", data);
   });
   socket.on("sortCards", (player) => {
     io.emit("sortCards", player);
   });
-  socket.on("drawCardsFromDeck", (player) => {
-    io.emit("drawCardsFromDeck", player);
+  socket.on("drawCardsFromDeck", (info) => {
+    io.in(info.room).emit("drawCardsFromDeck", info.playerNumber);
   });
   socket.on("reset", () => {
     io.emit("reset");
