@@ -22,11 +22,14 @@ app.get("/", function (req, res) {
 
 io.on("connection", (socket) => {
   console.log("New User connected");
+  console.log(socket.rooms);
 
   // Just to 1 user
   socket.emit("message", `[SERVER] You have connected`);
 
   socket.emit("message", socket.handshake.query.t);
+
+  socket.emit("userID", [...socket.rooms][0]);
 
   // To everyone but 1 user
 
