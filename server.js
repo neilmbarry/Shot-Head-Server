@@ -66,13 +66,13 @@ io.on("connection", (socket) => {
 
   socket.on("addPlayer", (data) => {
     console.log(`Adding player '${data.name}' to room: '${data.room}'`);
-    io.in(data.room).emit("addPlayer", data.name);
+    io.in(data.room).emit("addPlayer", data);
   });
   socket.on("getGameState", (data) => {
     const clients = io.sockets.adapter.rooms.get(data.room);
     const numClients = clients ? clients.size : 0;
-    if (numClients === 0) {
-      return io.in(data.room).emit("addPlayer", data.newPlayer);
+    if (numClients === 1) {
+      return io.in(data.room).emit("addPlayer", data);
     }
     console.log(`'${data.newPlayer}' is requesting state data`);
     io.in(data.room).emit("shareGameState", data.newPlayer);
