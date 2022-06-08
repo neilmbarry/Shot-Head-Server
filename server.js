@@ -71,20 +71,27 @@ io.on("connection", (socket) => {
   socket.on("getGameState", (data) => {
     const clients = io.sockets.adapter.rooms.get(data.room);
     const numClients = clients ? clients.size : 0;
+    console.log(data, "<=== DATA");
     if (numClients === 1) {
+      console.log("first client in room");
       return io.in(data.room).emit("addPlayer", data);
     }
-    console.log(`'${data.newPlayer}' is requesting state data`);
-    io.in(data.room).emit("shareGameState", data.newPlayer);
+    console.log("NOT THE FIRST");
+
+    console.log(`'${data.name}' is requesting state data`);
+    socket.to(data.room).emit("shareGameState", data.name);
     // socket.to(data.room).emit("shareGameState", data.newPlayer);
   });
   socket.on("setGameState", (data) => {
     console.log(`Sending state to all users`);
     io.in(data.state.room).emit("setGameState", data.state);
     console.log(
-      `Adding player $'{data.newPlayer}' to room: '${data.state.room}'`
+      `Adding player '${data.newPlayer}' to room: '${data.state.room}'`
     );
-    io.in(data.state.room).emit("addPlayer", data.newPlayer);
+    io.in(data.state.room).emit("addPlayer", {
+      room: data.state.room,
+      name: data.newPlayer,
+    });
 
     // io.emit("setGameState", state);
   });
