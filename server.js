@@ -25,9 +25,9 @@ io.on("connection", (socket) => {
   console.log(socket.rooms);
 
   // Just to 1 user
-  socket.emit("message", `[SERVER] You have connected`);
+  socket.emit("log", `[SERVER] You have connected`);
 
-  socket.emit("message", socket.handshake.query.t);
+  socket.emit("handshakeQuery", socket.handshake.query.t);
 
   socket.emit("userID", [...socket.rooms][0]);
 
@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A User disconnected");
     // To everyone
-    io.emit("message", "[SERVER] A user has left the chat");
+    io.emit("disconnection", [...socket.rooms][0]);
   });
 
   // socket.on("message", (message) => {
